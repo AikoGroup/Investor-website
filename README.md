@@ -1,36 +1,165 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aiko Investor Hub
 
-## Getting Started
+A modern, AI-driven investor relations platform built with Next.js, featuring:
+- AI-powered chat interface with Aika
+- Investor resources and documentation
+- User authentication and management
+- Real-time updates and notifications
 
-First, run the development server:
 
+## Prerequisites
+
+- Node.js 18.x or later
+- npm or yarn package manager
+- MongoDB (for user management)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/AikoGroup/website.git
+cd website
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+# Edit .env.local with your configuration
+```
+
+## Development Commands
+
+### Start Development Server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+### Run Tests
+```bash
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run workflow tests
+npm run test:workflow
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Test n8n Webhooks
+```bash
+# Test with default user profile
+node scripts/test-webhook.js
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Test with custom profile (edit userProfile in test-webhook.js)
+# - Modify user details
+# - Update preferences
+# - Change business context
+# Then run the test script
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The webhook test script sends a simulated user profile to the n8n workflow endpoint, allowing you to test:
+- User onboarding flow
+- Preference processing
+- Notification triggers
+- Integration responses
 
-## Learn More
+### User Management
 
-To learn more about Next.js, take a look at the following resources:
+#### Add New User
+```bash
+node scripts/add-user.js --email user@example.com --name "User Name" --role investor
+```
+Available roles: `investor`, `admin`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### List Users
+```bash
+node scripts/list-users.js
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### Remove User
+```bash
+node scripts/remove-user.js --email user@example.com
+```
 
-## Deploy on Vercel
+### Build and Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Build for Production
+```bash
+npm run build
+# or
+yarn build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Start Production Server
+```bash
+npm run start
+# or
+yarn start
+```
+
+## Project Structure
+
+```
+├── app/                  # Next.js app directory
+│   ├── api/             # API routes
+│   ├── auth/            # Authentication pages
+│   ├── chat/            # Chat interface
+│   ├── learn/           # Learn More page
+│   └── page.tsx         # Home page
+├── components/          # React components
+├── public/              # Static files
+│   └── investor-resources/  # Downloadable resources
+├── scripts/             # Utility scripts
+└── src/                 # Source files
+    ├── config/          # Configuration files
+    └── lib/             # Library code
+```
+
+## Contributing
+
+1. Create a new branch:
+```bash
+git checkout -b feature/your-feature-name
+```
+
+2. Make your changes and commit:
+```bash
+git commit -m "feat: add new feature"
+```
+
+3. Push to your branch:
+```bash
+git push origin feature/your-feature-name
+```
+
+4. Create a Pull Request
+
+## Troubleshooting
+
+### Common Issues
+
+1. **MongoDB Connection Error**
+   - Check if MongoDB is running
+   - Verify connection string in `.env.local`
+
+2. **Authentication Issues**
+   - Clear browser cookies and local storage
+   - Verify user exists in database
+   - Check auth configuration in `src/config/auth.json`
+
+3. **Build Errors**
+   - Clear `.next` directory: `rm -rf .next`
+   - Delete `node_modules` and reinstall: `rm -rf node_modules && yarn install`
+
+For more help, check the [documentation](https://docs.aiko.com) or contact the development team.
