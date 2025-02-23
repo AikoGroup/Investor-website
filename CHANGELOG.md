@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.2.0] - 2025-02-23
+### Added
+- Microsoft Clarity integration for enhanced analytics
+  - User behavior tracking
+  - Event tracking
+  - Session upgrades
+  - Custom tags
+- Cookie consent management
+- Favicon support
+  - Multiple resolutions (16x16, 32x32)
+  - Apple touch icon (180x180)
+  - Web manifest for PWA support
+
+### Fixed
+- Navigation visibility in layout component
+- Analytics initialization and event tracking
+- Header handling in server components
+
+
 ## [2025-02-23]
 ### Added
 - Created Learn More page with modern glassmorphic design
