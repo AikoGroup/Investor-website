@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
+import InvestModal from './InvestModal';
 
 const Navigation = () => {
   const pathname = usePathname();
+  const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
 
   // Don't render navigation on login page
   if (pathname === '/login') return null;
@@ -68,21 +70,23 @@ const Navigation = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setIsInvestModalOpen(true)}
                 className="
                   ml-4
                   px-6 py-2
-                  bg-gradient-to-r from-blue-500 to-blue-700
-                  hover:from-blue-600 hover:to-blue-800
+                  bg-gradient-to-r from-yellow-400 to-yellow-500
+                  hover:from-yellow-500 hover:to-yellow-600
                   rounded-full
-                  text-white
+                  text-gray-900
                   font-medium
                   shadow-lg
                   hover:shadow-xl
                   transition-all duration-300
                 "
               >
-                Invest Now
+                Express Interest
               </motion.button>
+              <InvestModal isOpen={isInvestModalOpen} setIsOpen={setIsInvestModalOpen} />
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import analytics, { ClarityEvents } from '@/lib/analytics';
 
 export default function LoginForm() {
@@ -18,36 +19,19 @@ export default function LoginForm() {
     setError('');
 
     try {
-      // Track login attempt
-      analytics.trackEvent({
-        category: 'authentication',
-        action: ClarityEvents.LOGIN_SUCCESS,
-        label: email
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: '/meetAika'
       });
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+      if (!result?.ok) {
+        setError('Email or password is incorrect');
+        setIsLoading(false);
+        return;
       }
 
-      // Wait for session to be established
-      const sessionResponse = await fetch('/api/auth/session');
-      const sessionData = await sessionResponse.json();
-      
-      if (!sessionData.user) {
-        throw new Error('Failed to establish session');
-      }
-
-      // Use replace instead of push to avoid history stack issues
       // Track successful login
       analytics.trackEvent({
         category: 'authentication',
@@ -55,46 +39,22 @@ export default function LoginForm() {
         label: email
       });
 
-      // Identify user in analytics
-      analytics.identifyUser({
-        id: sessionData.user.id,
-        email: sessionData.user.email,
-        role: sessionData.user.role
-      });
-
-      // Upgrade session for authenticated users
-      analytics.upgradeSession('authenticated_user');
-
-      window.location.href = '/meetAika';
-    } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
-      setError(errorMessage);
-
-      // Track login failure
-      analytics.trackEvent({
-        category: 'authentication',
-        action: ClarityEvents.LOGIN_FAILURE,
-        label: errorMessage
-      });
-    } finally {
+      // Navigate to meetAika using the router
+      if (result.url) {
+        router.push(result.url);
+      } else {
+        router.push('/meetAika');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setError(error.message || 'An error occurred');
       setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="
-        backdrop-blur-md
-        bg-white/5
-        border
-        border-white/10
-        rounded-2xl
-        p-8
-        w-full
-        max-w-md
-        shadow-xl
-      ">
+      <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-xl">
         <div className="flex justify-center mb-8">
           <Image
             src="/images/aiko_logo_white.svg"
@@ -124,26 +84,7 @@ export default function LoginForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="
-                appearance-none
-                relative
-                block
-                w-full
-                px-4
-                py-3
-                bg-white/10
-                border
-                border-white/20
-                placeholder-white/50
-                text-white
-                rounded-lg
-                focus:outline-none
-                focus:ring-2
-                focus:ring-blue-500/50
-                focus:border-transparent
-                backdrop-blur-sm
-                sm:text-sm
-              "
+              className="appearance-none relative block w-full px-4 py-3 bg-white/10 border border-white/20 placeholder-white/50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent backdrop-blur-sm sm:text-sm"
               placeholder="Email"
               autoComplete="email"
             />
@@ -160,26 +101,7 @@ export default function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="
-                appearance-none
-                relative
-                block
-                w-full
-                px-4
-                py-3
-                bg-white/10
-                border
-                border-white/20
-                placeholder-white/50
-                text-white
-                rounded-lg
-                focus:outline-none
-                focus:ring-2
-                focus:ring-blue-500/50
-                focus:border-transparent
-                backdrop-blur-sm
-                sm:text-sm
-              "
+              className="appearance-none relative block w-full px-4 py-3 bg-white/10 border border-white/20 placeholder-white/50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent backdrop-blur-sm sm:text-sm"
               placeholder="Password"
               autoComplete="current-password"
             />
@@ -193,36 +115,9 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="
-                group
-                relative
-                w-full
-                flex
-                justify-center
-                py-3
-                px-4
-                text-sm
-                font-medium
-                rounded-lg
-                text-white
-                bg-gradient-to-r
-                from-blue-500
-                to-blue-700
-                hover:from-blue-600
-                hover:to-blue-800
-                focus:outline-none
-                focus:ring-2
-                focus:ring-blue-500/50
-                focus:ring-offset-0
-                disabled:opacity-50
-                disabled:cursor-not-allowed
-                transition-all
-                duration-300
-                shadow-lg
-                hover:shadow-xl
-              "
+              className="group relative w-full flex justify-center py-3 px-4 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
             >
-              {isLoading ? 'Loading...' : 'Access Platform'}
+              {isLoading ? 'Loading...' : 'Meet Aika'}
             </button>
           </div>
         </form>
