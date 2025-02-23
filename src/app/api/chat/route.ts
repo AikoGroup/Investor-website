@@ -15,14 +15,16 @@ export async function POST(request: NextRequest) {
       user
     };
 
+    const startTime = Date.now();
     console.log('Sending request to n8n:', {
       url: process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL,
-      payload
+      payload,
+      timestamp: new Date().toISOString()
     });
     
     // Create an AbortController to handle timeouts
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+    const timeout = setTimeout(() => controller.abort(), 300000); // 5 minute timeout (leaving 1 minute buffer for Lambda)
 
     let response;
     try {
@@ -48,9 +50,10 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    console.log('N8N response status:', response.status);
+    console.log('N8N response status:', response.status, 'after', (Date.now() - startTime)/1000, 'seconds');
     const responseText = await response.text();
     console.log('N8N response body:', responseText);
+    console.log('Total request time:', (Date.now() - startTime)/1000, 'seconds');
 
     if (!response.ok) {
       throw new Error(`Failed to get response from n8n: ${response.status} ${responseText}`);
