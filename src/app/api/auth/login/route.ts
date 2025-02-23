@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     if (!user) {
       console.log('User not found');
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        { success: false, error: 'Email or password is incorrect' },
         { status: 401 }
       );
     }
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     if (!isValidPassword) {
       console.log('Invalid password');
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        { success: false, error: 'Email or password is incorrect' },
         { status: 401 }
       );
     }
@@ -54,7 +54,8 @@ export async function POST(request: Request) {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName
+        firstName: user.firstName,
+        name: user.firstName
       }
     });
 

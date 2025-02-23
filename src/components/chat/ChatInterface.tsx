@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { SuggestionButtons } from './SuggestionButtons';
+import { TypingIndicator } from './TypingIndicator';
 
 interface Message {
   id: string;
@@ -26,9 +27,21 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { data: session } = useSession();
-  const sessionIdRef = useRef<string>(`user-${session?.user?.id || 'anonymous'}-${Date.now()}`);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { user, loading } = useAuth();
+  
+  useEffect(() => {
+    console.log('Auth status:', loading ? 'loading' : 'ready');
+    console.log('User data:', user);
+  }, [user, loading]);
+  const sessionIdRef = useRef<string>(`user-${user?.id || 'anonymous'}-${Date.now()}`);
+  
+  // Update sessionId when user changes
+  useEffect(() => {
+    if (user?.id) {
+      sessionIdRef.current = `user-${user.id}-${Date.now()}`;
+    }
+  }, [user]);
   const router = useRouter();
 
   const sendMessage = async (messageContent: string) => {
@@ -43,6 +56,8 @@ export default function ChatInterface() {
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    // Scroll after a brief delay to ensure message is rendered
+    setTimeout(scrollToLastMessage, 50);
 
     try {
       const response = await fetch('/api/chat', {
@@ -57,7 +72,16 @@ export default function ChatInterface() {
             role: msg.role,
             content: msg.content
           })),
-          sessionId: sessionIdRef.current
+          sessionId: sessionIdRef.current,
+          user: user ? {
+            name: user.firstName || user.name,
+            email: user.email,
+            id: user.id
+          } : {
+            name: 'Guest',
+            email: null,
+            id: null
+          }
         }),
       });
 
@@ -74,6 +98,8 @@ export default function ChatInterface() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      // Scroll after AI message with a longer delay for suggestions
+      setTimeout(scrollToLastMessage, 100);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
@@ -100,12 +126,35 @@ export default function ChatInterface() {
     await sendMessage(message);
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToLastMessage = () => {
+    setTimeout(() => {
+      if (!chatContainerRef.current) return;
+      
+      // Find the last message element
+      const messages = chatContainerRef.current.children;
+      const lastMessage = messages[messages.length - 2]; // -2 because last child is the dummy div
+      
+      if (lastMessage) {
+        // Get the position of the last message relative to the container
+        const containerRect = chatContainerRef.current.getBoundingClientRect();
+        const messageRect = lastMessage.getBoundingClientRect();
+        
+        // Calculate the scroll position to show the top of the message
+        const scrollTop = messageRect.top - containerRect.top + chatContainerRef.current.scrollTop;
+        
+        chatContainerRef.current.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }, 50);
   };
 
+  // Scroll on any message change
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) {
+      setTimeout(scrollToLastMessage, 50);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -121,27 +170,7 @@ export default function ChatInterface() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4">
-        <Image
-          src="/images/aiko_logo_white.svg"
-          alt="Aiko Logo"
-          width={100}
-          height={40}
-          priority
-        />
-        <div className="flex gap-4">
-          <button className="text-white hover:text-gray-200">Meet Aika</button>
-          <button className="text-white hover:text-gray-200">Learn More</button>
-          <button 
-            onClick={() => router.push('/')}
-            className="text-white hover:text-gray-200"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+    <div className="flex flex-col h-screen pt-16">
 
       {/* Chat Container */}
       <div className="flex-1 flex flex-col items-center justify-center px-4">
@@ -164,7 +193,7 @@ export default function ChatInterface() {
 
         {/* Chat Box */}
         <div className="w-[600px] bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/20">
-          <div className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+          <div ref={chatContainerRef} className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -177,7 +206,13 @@ export default function ChatInterface() {
                       : 'bg-blue-100/90 backdrop-blur-sm text-blue-900 shadow-md'
                   }`}
                 >
-                  {message.content}
+                  <div className="whitespace-pre-line">
+                    {message.content.split('\n\n').map((paragraph, index) => (
+                      <p key={index} className={index > 0 ? 'mt-4' : ''}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
                 </div>
                 {message.role === 'assistant' && message.suggestions && (
                   <SuggestionButtons
@@ -187,7 +222,8 @@ export default function ChatInterface() {
                 )}
               </div>
             ))}
-            <div ref={messagesEndRef} />
+            {isLoading && <TypingIndicator />}
+            <div />
           </div>
 
           {/* Input Form */}

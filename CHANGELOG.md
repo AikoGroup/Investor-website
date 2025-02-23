@@ -8,6 +8,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added react-icons package for improved icon support
+- Added 'use client' directive to client components
+
+### Fixed
+- Fixed navigation bar logo path to use correct SVG file
+- Removed duplicate header from chat interface
+- Fixed dependency conflicts with legacy peer deps
+
+### Added
+- Enhanced login experience:
+  - Clean, dedicated login layout without navigation
+  - Glassmorphic login form with modern styling
+  - Automatic redirection from root to login page
+  - Improved form field styling and interactions
+
+### Added
+- Added global navigation with animated transitions:
+  - Glassmorphic navigation bar with hover effects
+  - Smooth tab transitions with Framer Motion
+  - Consistent navigation between Chat and Learn More pages
+  - Prominent Invest Now CTA button
+
+### Added
+- Created comprehensive Learn More page with interactive elements:
+  - Glassmorphic design with gradient backgrounds
+  - Interactive FAQ accordion with animations
+  - Downloadable resources section
+  - Feature cards with hover effects
+  - Clear call-to-action sections
+- Added reusable components:
+  - GlassCard for consistent glassmorphic styling
+  - GradientButton for primary actions
+  - FeatureCard for showcasing features
+  - ResourceCard for downloadable content
+  - FAQAccordion for expandable Q&As
+
+### Added
+- Enhanced user profiles with rich professional and personal information:
+  - Professional context (company, role, industry, company size)
+  - Business context (interests, expertise, business goals)
+  - Communication preferences
+  - Location and timezone information
+- Updated test webhook with formatted user parameters for easy testing
+- Added personalized AI responses based on user profile
+
+### Added
 - Created LoginForm component with email and first name fields
 - Implemented responsive login page UI with gradient background
 - Added Aiko logo to login page
