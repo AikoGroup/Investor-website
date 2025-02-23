@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import analytics, { ClarityEvents } from '@/lib/analytics';
+import analytics, { Events } from '@/lib/analytics';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -35,7 +35,7 @@ export default function LoginForm() {
       // Track successful login
       analytics.trackEvent({
         category: 'authentication',
-        action: ClarityEvents.LOGIN_SUCCESS,
+        action: Events.LOGIN_SUCCESS,
         label: email
       });
 
@@ -45,9 +45,9 @@ export default function LoginForm() {
       } else {
         router.push('/meetAika');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || 'An error occurred');
+      setError(error instanceof Error ? error.message : 'An error occurred');
       setIsLoading(false);
     }
   };

@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
-import { authOptions } from '@/lib/auth';
+import { signIn } from 'next-auth/react';
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const result = await authOptions.providers[0].authorize?.({ 
-      email, 
+    const result = await signIn('credentials', {
+      email,
       password,
       redirect: false
-    } as any);
+    });
 
-    if (result) {
+    if (!result?.error) {
       return NextResponse.json({ success: true });
     }
 

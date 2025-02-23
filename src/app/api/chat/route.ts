@@ -87,10 +87,13 @@ Response to analyze: "${data.output}"`
     
     try {
       // Extract text content from Anthropic response
-      const text = suggestionData.content[0].text;
+      const response = suggestionData.content[0];
+      if (response.type !== 'text') {
+        throw new Error('Expected text response from Anthropic');
+      }
       
       // Parse the response as JSON
-      suggestions = JSON.parse(text);
+      suggestions = JSON.parse(response.text);
       
       // Validate and clean up suggestions
       if (Array.isArray(suggestions)) {

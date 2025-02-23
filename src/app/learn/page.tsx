@@ -7,18 +7,15 @@ import FeatureCard from '@/components/learn/FeatureCard';
 import ResourceCard from '@/components/learn/ResourceCard';
 import FaqAccordion from '@/components/learn/FaqAccordion';
 import { FaDownload, FaCalendar, FaRocket, FaRobot, FaChartLine, FaShieldAlt, FaMoneyBillWave, FaBolt, FaCogs, FaHandshake } from 'react-icons/fa';
-import analytics, { ClarityEvents } from '@/lib/analytics';
+import analytics, { Events } from '@/lib/analytics';
 
 const LearnPage = () => {
   const handleDownload = (documentType: string, documentPath: string) => {
     analytics.trackEvent({
       category: 'document',
-      action: ClarityEvents.DOCUMENT_DOWNLOAD,
+      action: Events.DOCUMENT_DOWNLOAD,
       label: documentType
     });
-
-    // Upgrade session for users downloading investor materials
-    analytics.upgradeSession('investor_document_download');
 
     // Open document in new tab
     window.open(documentPath, '_blank');
@@ -72,7 +69,7 @@ const LearnPage = () => {
           <GlassCard>
             <h2 className="text-3xl font-bold mb-4 text-center">Why Invest in Aiko?</h2>
             <p className="text-lg mb-6 text-center text-blue-100">
-              Aiko is not just another insurtech—we are pioneering a new category of AI-driven, adaptive insurance for the UK's 4M+ hybrid workers.
+              Aiko is not just another insurtech—we are pioneering a new category of AI-driven, adaptive insurance for the UK&apos;s 4M+ hybrid workers.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <FeatureCard

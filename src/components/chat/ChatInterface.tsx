@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { SuggestionButtons } from './SuggestionButtons';
 import { TypingIndicator } from './TypingIndicator';
@@ -15,7 +14,6 @@ interface Message {
   suggestions?: Suggestion[];
 }
 
-import { extractSuggestions } from '@/utils/extractSuggestions';
 
 interface Suggestion {
   label: string;
@@ -26,7 +24,6 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { user, loading } = useAuth();
   
@@ -42,7 +39,6 @@ export default function ChatInterface() {
       sessionIdRef.current = `user-${user.id}-${Date.now()}`;
     }
   }, [user]);
-  const router = useRouter();
 
   const sendMessage = async (messageContent: string) => {
     if (!messageContent.trim() || isLoading) return;
@@ -74,7 +70,7 @@ export default function ChatInterface() {
           })),
           sessionId: sessionIdRef.current,
           user: user ? {
-            name: user.firstName || user.name,
+            name: user.firstName,
             email: user.email,
             id: user.id
           } : {
@@ -167,7 +163,7 @@ export default function ChatInterface() {
         timestamp: Date.now()
       }]);
     }
-  }, []);
+  }, [messages.length]);
 
   return (
     <div className="flex flex-col h-screen pt-16">
