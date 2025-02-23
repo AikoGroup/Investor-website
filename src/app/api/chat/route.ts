@@ -20,14 +20,33 @@ export async function POST(request: NextRequest) {
       payload
     });
     
-    const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    });
+    // Create an AbortController to handle timeouts
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+    let response;
+    try {
+      response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Request timed out');
+        return NextResponse.json(
+          { error: 'Request timed out. Please try again.' },
+          { status: 504 }
+        );
+      }
+      throw error;
+    }
 
     console.log('N8N response status:', response.status);
     const responseText = await response.text();
