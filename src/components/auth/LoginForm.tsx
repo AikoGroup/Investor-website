@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import analytics, { ClarityEvents } from '@/lib/analytics';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -17,6 +18,13 @@ export default function LoginForm() {
     setError('');
 
     try {
+      // Track login attempt
+      analytics.trackEvent({
+        category: 'authentication',
+        action: ClarityEvents.LOGIN_SUCCESS,
+        label: email
+      });
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -40,10 +48,35 @@ export default function LoginForm() {
       }
 
       // Use replace instead of push to avoid history stack issues
+      // Track successful login
+      analytics.trackEvent({
+        category: 'authentication',
+        action: ClarityEvents.LOGIN_SUCCESS,
+        label: email
+      });
+
+      // Identify user in analytics
+      analytics.identifyUser({
+        id: sessionData.user.id,
+        email: sessionData.user.email,
+        role: sessionData.user.role
+      });
+
+      // Upgrade session for authenticated users
+      analytics.upgradeSession('authenticated_user');
+
       window.location.href = '/meetAika';
     } catch (err) {
       console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(errorMessage);
+
+      // Track login failure
+      analytics.trackEvent({
+        category: 'authentication',
+        action: ClarityEvents.LOGIN_FAILURE,
+        label: errorMessage
+      });
     } finally {
       setIsLoading(false);
     }

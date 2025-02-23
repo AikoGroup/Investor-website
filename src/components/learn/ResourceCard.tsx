@@ -9,11 +9,22 @@ interface ResourceCardProps {
   description: string;
   icon: React.ReactNode;
   href: string;
+  onClick?: () => void;
 }
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ title, description, icon, href }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ title, description, icon, href, onClick }) => {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a 
+      href={href} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

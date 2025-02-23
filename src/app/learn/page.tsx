@@ -7,8 +7,22 @@ import FeatureCard from '@/components/learn/FeatureCard';
 import ResourceCard from '@/components/learn/ResourceCard';
 import FaqAccordion from '@/components/learn/FaqAccordion';
 import { FaDownload, FaCalendar, FaRocket, FaRobot, FaChartLine, FaShieldAlt, FaMoneyBillWave, FaBolt, FaCogs, FaHandshake } from 'react-icons/fa';
+import analytics, { ClarityEvents } from '@/lib/analytics';
 
 const LearnPage = () => {
+  const handleDownload = (documentType: string, documentPath: string) => {
+    analytics.trackEvent({
+      category: 'document',
+      action: ClarityEvents.DOCUMENT_DOWNLOAD,
+      label: documentType
+    });
+
+    // Upgrade session for users downloading investor materials
+    analytics.upgradeSession('investor_document_download');
+
+    // Open document in new tab
+    window.open(documentPath, '_blank');
+  };
   return (
     <main className="min-h-screen bg-blue-600 text-white">
       {/* Hero Section */}
@@ -27,16 +41,16 @@ const LearnPage = () => {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <GradientButton
-                  href="/investor-resources/Pitch_Deck_Latest.pdf"
+                  href="#"
                   icon={<FaDownload />}
-                  openInNewTab
+                  onClick={() => handleDownload('pitch_deck', '/investor-resources/Pitch_Deck_Latest.pdf')}
                 >
                   Download Pitch Deck
                 </GradientButton>
                 <GradientButton
-                  href="/investor-resources/Aiko_Whitepaper_Latest.pdf"
+                  href="#"
                   icon={<FaDownload />}
-                  openInNewTab
+                  onClick={() => handleDownload('whitepaper', '/investor-resources/Aiko_Whitepaper_Latest.pdf')}
                 >
                   Download Whitepaper
                 </GradientButton>
@@ -132,13 +146,15 @@ const LearnPage = () => {
                 title="Pitch Deck"
                 description="A high-level overview of Aiko's business model, financials, and investment opportunity."
                 icon={<FaDownload />}
-                href="/investor-resources/Pitch_Deck_Latest.pdf"
+                onClick={() => handleDownload('pitch_deck', '/investor-resources/Pitch_Deck_Latest.pdf')}
+                href="#"
               />
               <ResourceCard
                 title="Whitepaper"
                 description="A deep dive into Aiko's AI architecture, risk models, and market opportunity."
                 icon={<FaDownload />}
-                href="/investor-resources/Aiko_Whitepaper_Latest.pdf"
+                onClick={() => handleDownload('whitepaper', '/investor-resources/Aiko_Whitepaper_Latest.pdf')}
+                href="#"
               />
               {/* Temporarily hide one-pager until file is added */}
               {/* <ResourceCard
