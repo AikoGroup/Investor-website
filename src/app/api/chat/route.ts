@@ -62,7 +62,13 @@ export async function POST(request: NextRequest) {
         max_tokens: 1024,
         messages: [{
           role: 'user',
-          content: `Generate 2-3 follow-up questions an investor might ask about this response. Return ONLY a JSON array with objects containing "label" (max 35 chars) and "value" (full question). Example format: [{"label":"How does your IoT technology work?","value":"Can you explain how your IoT devices collect and process data in real-time?"}]. Focus on business value and use investor perspective ("your" not "our"). Do not use abbreviations in labels (e.g. use "management" not "mgmt", "technology" not "tech").
+          content: `Generate 1-3 follow-up questions an investor might ask about this response, prioritizing the most important questions. Return ONLY a JSON array with objects containing "label" (concise button text) and "value" (complete question). Example format: [{"label":"How does your IoT technology work?","value":"Can you explain how your IoT devices collect and process data in real-time?"}]. 
+
+Requirements:
+- Return only the 1-3 most important questions
+- Focus on business value and investor perspective ("your" not "our")
+- Do not use abbreviations (e.g. use "management" not "mgmt")
+- Keep labels clear but concise
 
 Response to analyze: "${data.output}"`
         }],

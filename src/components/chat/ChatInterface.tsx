@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { SuggestionButtons } from './SuggestionButtons';
+import { TypingIndicator } from './TypingIndicator';
 
 interface Message {
   id: string;
@@ -26,7 +27,7 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
   const sessionIdRef = useRef<string>(`user-${session?.user?.id || 'anonymous'}-${Date.now()}`);
   const router = useRouter();
@@ -43,6 +44,8 @@ export default function ChatInterface() {
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    // Scroll after a brief delay to ensure message is rendered
+    setTimeout(scrollToLastMessage, 50);
 
     try {
       const response = await fetch('/api/chat', {
@@ -74,6 +77,8 @@ export default function ChatInterface() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      // Scroll after AI message with a longer delay for suggestions
+      setTimeout(scrollToLastMessage, 100);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
@@ -100,12 +105,35 @@ export default function ChatInterface() {
     await sendMessage(message);
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToLastMessage = () => {
+    setTimeout(() => {
+      if (!chatContainerRef.current) return;
+      
+      // Find the last message element
+      const messages = chatContainerRef.current.children;
+      const lastMessage = messages[messages.length - 2]; // -2 because last child is the dummy div
+      
+      if (lastMessage) {
+        // Get the position of the last message relative to the container
+        const containerRect = chatContainerRef.current.getBoundingClientRect();
+        const messageRect = lastMessage.getBoundingClientRect();
+        
+        // Calculate the scroll position to show the top of the message
+        const scrollTop = messageRect.top - containerRect.top + chatContainerRef.current.scrollTop;
+        
+        chatContainerRef.current.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }, 50);
   };
 
+  // Scroll on any message change
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) {
+      setTimeout(scrollToLastMessage, 50);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -164,7 +192,7 @@ export default function ChatInterface() {
 
         {/* Chat Box */}
         <div className="w-[600px] bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/20">
-          <div className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+          <div ref={chatContainerRef} className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -177,7 +205,13 @@ export default function ChatInterface() {
                       : 'bg-blue-100/90 backdrop-blur-sm text-blue-900 shadow-md'
                   }`}
                 >
-                  {message.content}
+                  <div className="whitespace-pre-line">
+                    {message.content.split('\n\n').map((paragraph, index) => (
+                      <p key={index} className={index > 0 ? 'mt-4' : ''}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
                 </div>
                 {message.role === 'assistant' && message.suggestions && (
                   <SuggestionButtons
@@ -187,7 +221,8 @@ export default function ChatInterface() {
                 )}
               </div>
             ))}
-            <div ref={messagesEndRef} />
+            {isLoading && <TypingIndicator />}
+            <div />
           </div>
 
           {/* Input Form */}

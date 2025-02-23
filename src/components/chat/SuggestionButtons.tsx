@@ -17,12 +17,12 @@ export const SuggestionButtons: React.FC<SuggestionButtonsProps> = ({
   if (!suggestions.length) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 mt-4 mb-2">
-      {suggestions.map((suggestion, index) => (
+    <div className="flex flex-col items-end gap-2 mt-2 mb-2 w-full">
+      {suggestions.slice(0, 3).map((suggestion, index) => (
         <button
           key={index}
           onClick={() => onSuggestionClick(suggestion.value)}
-          className="px-4 py-2 text-sm text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-sm transition-colors whitespace-normal text-left"
+          className="px-4 py-2 text-sm text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-colors text-left break-words rounded-full max-w-[300px] shadow-sm"
         >
           {suggestion.label}
         </button>
