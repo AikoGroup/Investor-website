@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { headers } from 'next/headers';
 import SessionProvider from '@/components/providers/SessionProvider';
+import Navigation from '@/components/common/Navigation';
 import './globals.css';
 
 const inter = Inter({
@@ -16,6 +18,12 @@ export const metadata: Metadata = {
   },
 };
 
+function shouldShowNav(pathname: string) {
+  // Add any routes that shouldn't show the navigation bar
+  const excludedRoutes = ['/login'];
+  return !excludedRoutes.includes(pathname);
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,7 +33,10 @@ export default function RootLayout({
     <html lang="en" className={inter.className}>
       <body className="antialiased bg-gradient-to-br from-blue-500 to-blue-600">
         <SessionProvider>
-          <main>{children}</main>
+          {shouldShowNav(headers().get('x-pathname') || '') && <Navigation />}
+          <main className="min-h-screen">
+            {children}
+          </main>
         </SessionProvider>
       </body>
     </html>

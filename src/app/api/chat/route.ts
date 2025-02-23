@@ -4,14 +4,15 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export async function POST(request: NextRequest) {
   try {
-    const { input, history, context, sessionId } = await request.json();
+    const { input, history, context, sessionId, user } = await request.json();
     console.log('Received payload:', { input, history, context, sessionId });
 
     const payload = {
       input,
       history,
       context,
-      sessionId
+      sessionId,
+      user
     };
 
     console.log('Sending request to n8n:', {

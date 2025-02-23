@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { SuggestionButtons } from './SuggestionButtons';
 import { TypingIndicator } from './TypingIndicator';
 
@@ -28,8 +28,20 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const { data: session } = useSession();
-  const sessionIdRef = useRef<string>(`user-${session?.user?.id || 'anonymous'}-${Date.now()}`);
+  const { user, loading } = useAuth();
+  
+  useEffect(() => {
+    console.log('Auth status:', loading ? 'loading' : 'ready');
+    console.log('User data:', user);
+  }, [user, loading]);
+  const sessionIdRef = useRef<string>(`user-${user?.id || 'anonymous'}-${Date.now()}`);
+  
+  // Update sessionId when user changes
+  useEffect(() => {
+    if (user?.id) {
+      sessionIdRef.current = `user-${user.id}-${Date.now()}`;
+    }
+  }, [user]);
   const router = useRouter();
 
   const sendMessage = async (messageContent: string) => {
@@ -60,7 +72,16 @@ export default function ChatInterface() {
             role: msg.role,
             content: msg.content
           })),
-          sessionId: sessionIdRef.current
+          sessionId: sessionIdRef.current,
+          user: user ? {
+            name: user.firstName || user.name,
+            email: user.email,
+            id: user.id
+          } : {
+            name: 'Guest',
+            email: null,
+            id: null
+          }
         }),
       });
 
@@ -149,27 +170,7 @@ export default function ChatInterface() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4">
-        <Image
-          src="/images/aiko_logo_white.svg"
-          alt="Aiko Logo"
-          width={100}
-          height={40}
-          priority
-        />
-        <div className="flex gap-4">
-          <button className="text-white hover:text-gray-200">Meet Aika</button>
-          <button className="text-white hover:text-gray-200">Learn More</button>
-          <button 
-            onClick={() => router.push('/')}
-            className="text-white hover:text-gray-200"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+    <div className="flex flex-col h-screen pt-16">
 
       {/* Chat Container */}
       <div className="flex-1 flex flex-col items-center justify-center px-4">
