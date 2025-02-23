@@ -1,5 +1,20 @@
 # Changelog
 
+## [2025-02-23]
+### Added
+- Created Learn More page with modern glassmorphic design
+  - Hero section with clear value proposition and CTA buttons
+  - "Why Invest in Aiko?" section highlighting key investment points
+  - "How Aiko Works" section explaining the technology
+  - Downloadable resources section with pitch deck and whitepaper
+  - FAQ accordion section for investor questions
+- New components:
+  - `ResourceCard` for downloadable documents
+  - `FaqAccordion` with smooth animations
+- Added `openInNewTab` prop to `GradientButton` component
+- Created `/public/investor-resources` directory for investor documents
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

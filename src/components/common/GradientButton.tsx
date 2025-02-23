@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 interface GradientButtonProps {
+  openInNewTab?: boolean;
   children: React.ReactNode;
   href: string;
   icon?: React.ReactNode;
@@ -14,7 +15,8 @@ const GradientButton: React.FC<GradientButtonProps> = ({
   href,
   icon,
   className = '',
-  onClick
+  onClick,
+  openInNewTab = false
 }) => {
   const buttonClasses = `
     inline-flex
@@ -44,6 +46,15 @@ const GradientButton: React.FC<GradientButtonProps> = ({
         {icon && <span className="w-5 h-5">{icon}</span>}
         {children}
       </button>
+    );
+  }
+
+  if (openInNewTab) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={buttonClasses}>
+        {icon && <span className="w-5 h-5">{icon}</span>}
+        {children}
+      </a>
     );
   }
 
