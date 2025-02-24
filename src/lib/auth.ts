@@ -20,12 +20,20 @@ interface User {
 // Get users from environment variables
 const getUsers = (): User[] => {
   const usersJson = process.env.AUTH_USERS;
+  console.log('Auth users from env:', usersJson); // Debug log
+  
   if (!usersJson) {
     console.error('No users found in environment variables');
     return [];
   }
   try {
-    return JSON.parse(usersJson);
+    // Clean the JSON string - remove any whitespace at start/end
+    const cleanJson = usersJson.trim();
+    console.log('Cleaned JSON:', cleanJson); // Debug log
+    
+    const users = JSON.parse(cleanJson);
+    console.log('Parsed users:', users); // Debug log
+    return users;
   } catch (error) {
     console.error('Failed to parse users from environment variables:', error);
     return [];
