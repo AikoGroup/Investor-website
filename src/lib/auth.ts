@@ -1,10 +1,36 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import fs from 'fs'
-import path from 'path'
 import bcrypt from 'bcryptjs'
 
-const AUTH_FILE_PATH = path.join(process.cwd(), 'src/config/auth.json')
+interface User {
+  id: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  role?: string;
+  industry?: string;
+  companySize?: string;
+  department?: string;
+  location?: string;
+  timezone?: string;
+}
+
+// Get users from environment variables
+const getUsers = (): User[] => {
+  const usersJson = process.env.AUTH_USERS;
+  if (!usersJson) {
+    console.error('No users found in environment variables');
+    return [];
+  }
+  try {
+    return JSON.parse(usersJson);
+  } catch (error) {
+    console.error('Failed to parse users from environment variables:', error);
+    return [];
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development',
@@ -21,15 +47,8 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Read users from JSON file
-          const authData = JSON.parse(fs.readFileSync(AUTH_FILE_PATH, 'utf-8'))
-          interface User {
-            email: string;
-            password: string;
-            name?: string;
-            role?: string;
-          }
-          const user = authData.users.find((u: User) => u.email === credentials.email)
+          const users = getUsers();
+          const user = users.find(u => u.email === credentials.email)
 
           if (!user) {
             return null
