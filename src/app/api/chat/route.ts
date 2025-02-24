@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
+export const maxDuration = 60; // Set maximum duration to 60 seconds (Vercel Hobby limit)
+
 export async function POST(request: NextRequest) {
   try {
     const { input, history, context, sessionId, user } = await request.json();
@@ -15,23 +17,45 @@ export async function POST(request: NextRequest) {
       user
     };
 
+    const startTime = Date.now();
     console.log('Sending request to n8n:', {
       url: process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL,
-      payload
+      payload,
+      timestamp: new Date().toISOString()
     });
     
-    const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    });
+    // Create an AbortController to handle timeouts
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 58000); // 58 second timeout (2s buffer before Vercel limit)
 
-    console.log('N8N response status:', response.status);
+    let response;
+    try {
+      response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Request timed out');
+        return NextResponse.json(
+          { error: 'Request timed out. Please try again.' },
+          { status: 504 }
+        );
+      }
+      throw error;
+    }
+
+    console.log('N8N response status:', response.status, 'after', (Date.now() - startTime)/1000, 'seconds');
     const responseText = await response.text();
     console.log('N8N response body:', responseText);
+    console.log('Total request time:', (Date.now() - startTime)/1000, 'seconds');
 
     if (!response.ok) {
       throw new Error(`Failed to get response from n8n: ${response.status} ${responseText}`);
@@ -87,10 +111,13 @@ Response to analyze: "${data.output}"`
     
     try {
       // Extract text content from Anthropic response
-      const text = suggestionData.content[0].text;
+      const response = suggestionData.content[0];
+      if (response.type !== 'text') {
+        throw new Error('Expected text response from Anthropic');
+      }
       
       // Parse the response as JSON
-      suggestions = JSON.parse(text);
+      suggestions = JSON.parse(response.text);
       
       // Validate and clean up suggestions
       if (Array.isArray(suggestions)) {

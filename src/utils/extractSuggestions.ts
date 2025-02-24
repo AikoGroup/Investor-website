@@ -35,7 +35,7 @@ export function extractSuggestions(content: string): Topic[] {
       // Convert long points into concise buttons
       if (cleanPoint.length > 50) {
         // Find the main topic
-        const topic = Object.entries(topics).find(([_, keywords]) =>
+        const topic = Object.entries(topics).find(([, keywords]) =>
           keywords.some(keyword => cleanPoint.toLowerCase().includes(keyword.toLowerCase()))
         );
 

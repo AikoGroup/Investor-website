@@ -12,22 +12,22 @@ export default function CookieConsent() {
     if (!consent) {
       setShowBanner(true);
     } else {
-      // If consent was previously given, initialize analytics
+      // Initialize analytics if consent was previously given
       if (consent === 'granted') {
-        analytics.setConsent(true);
+        analytics.init();
       }
     }
   }, []);
 
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'granted');
-    analytics.setConsent(true);
+    analytics.init();
     setShowBanner(false);
   };
 
   const handleDecline = () => {
     localStorage.setItem('cookieConsent', 'declined');
-    analytics.setConsent(false);
+    // Do not initialize analytics when declined
     setShowBanner(false);
   };
 
@@ -39,7 +39,7 @@ export default function CookieConsent() {
         <div className="text-white text-sm">
           <p>
             We use cookies and similar technologies to help personalise content, 
-            enhance your experience, and analyse our traffic. By clicking "Accept",
+            enhance your experience, and analyse our traffic. By clicking &quot;Accept&quot;,
             you consent to our use of cookies.
           </p>
         </div>

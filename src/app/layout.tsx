@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import SessionProvider from '@/components/providers/SessionProvider';
-import ClarityProvider from '@/components/providers/ClarityProvider';
+
 import NavigationWrapper from '@/components/layout/NavigationWrapper';
 import './globals.css';
 
@@ -37,7 +37,6 @@ export default function RootLayout({
 
       <body className="antialiased bg-gradient-to-br from-blue-500 to-blue-600">
         <SessionProvider>
-          <ClarityProvider />
           <NavigationWrapper />
           <main className="min-h-screen">
             {children}
