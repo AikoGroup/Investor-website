@@ -18,9 +18,11 @@ declare module 'next-auth' {
     location?: string
     timezone?: string
   }
+}
 
-  interface Session {
-    user: User
+declare module 'next-auth/jwt' {
+  interface JWT {
+    user?: User
   }
 }
 
@@ -121,27 +123,19 @@ export const authOptions: NextAuthOptions = {
     }
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT & { user?: User }, user: User | null }) {
+    async jwt({ token, user }) {
       // Pass user data to the token on sign in
       if (user) {
         token.user = user;
       }
       return token;
     },
-    async session({ session, token }: { session: Session, token: JWT & { user?: User } }) {
+    async session({ session, token }) {
       if (token.user) {
         // Pass all user data from token to session
-        session.user = token.user as typeof session.user & {
-          id: string;
-          firstName?: string;
-          lastName?: string;
-          company?: string;
-          role?: string;
-          industry?: string;
-          companySize?: string;
-          department?: string;
-          location?: string;
-          timezone?: string;
+        session.user = {
+          ...session.user,
+          ...token.user,
         };
       }
       return session;
