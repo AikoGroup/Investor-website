@@ -25,16 +25,20 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   
-  // Use memoized session ID that persists across re-renders but updates with user
+  useEffect(() => {
+    console.log('Auth status:', loading ? 'loading' : 'ready');
+    console.log('User data:', user);
+  }, [user, loading]);
   const sessionIdRef = useRef<string>(`user-${user?.id || 'anonymous'}-${Date.now()}`);
   
+  // Update sessionId when user changes
   useEffect(() => {
     if (user?.id) {
       sessionIdRef.current = `user-${user.id}-${Date.now()}`;
     }
-  }, [user?.id]);
+  }, [user]);
 
   const sendMessage = async (messageContent: string) => {
     if (!messageContent.trim() || isLoading) return;
