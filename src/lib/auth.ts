@@ -1,8 +1,30 @@
-import { NextAuthOptions } from "next-auth"
+import { NextAuthOptions, Session, User } from "next-auth"
+import { JWT } from "next-auth/jwt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcryptjs'
 
-interface User {
+// Extend the built-in types
+declare module 'next-auth' {
+  interface User {
+    id: string
+    email: string
+    firstName?: string
+    lastName?: string
+    company?: string
+    role?: string
+    industry?: string
+    companySize?: string
+    department?: string
+    location?: string
+    timezone?: string
+  }
+
+  interface Session {
+    user: User
+  }
+}
+
+interface StoredUser {
   id: string;
   email: string;
   password: string;
@@ -18,7 +40,7 @@ interface User {
 }
 
 // Get users from environment variables
-const getUsers = (): User[] => {
+const getUsers = (): StoredUser[] => {
   const usersJson = process.env.AUTH_USERS;
   console.log('Auth users from env:', usersJson); // Debug log
   
@@ -61,20 +83,20 @@ export const authOptions: NextAuthOptions = {
           }
 
           const users = getUsers();
-          const user = users.find(u => u.email === credentials.email)
-
-          if (!user) {
+          const storedUser = users.find(u => u.email === credentials.email)
+          
+          if (!storedUser) {
             return null
           }
 
           // Compare password with bcrypt
-          const isValidPassword = await bcrypt.compare(credentials.password, user.password)
+          const isValidPassword = await bcrypt.compare(credentials.password, storedUser.password)
           if (!isValidPassword) {
             return null
           }
 
           // Return all user data except password
-          const { password, ...userData } = user;
+          const { password, ...userData } = storedUser;
           return userData;
         } catch (error) {
           console.error('Auth error:', error)
@@ -99,14 +121,14 @@ export const authOptions: NextAuthOptions = {
     }
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT & { user?: User }, user: User | null }) {
       // Pass user data to the token on sign in
       if (user) {
         token.user = user;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session, token: JWT & { user?: User } }) {
       if (token.user) {
         // Pass all user data from token to session
         session.user = token.user as typeof session.user & {
