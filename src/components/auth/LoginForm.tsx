@@ -19,19 +19,32 @@ export default function LoginForm() {
     setError('');
 
     try {
-      // Track successful login before redirect
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: '/meetAika'
+      });
+
+      if (!result?.ok) {
+        setError('Email or password is incorrect');
+        setIsLoading(false);
+        return;
+      }
+
+      // Track successful login
       analytics.trackEvent({
         category: 'authentication',
         action: Events.LOGIN_SUCCESS,
         label: email
       });
 
-      await signIn('credentials', {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: '/meetAika'
-      });
+      // Redirect after tracking
+      if (result.url) {
+        router.push(result.url);
+      } else {
+        router.push('/meetAika');
+      }
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
