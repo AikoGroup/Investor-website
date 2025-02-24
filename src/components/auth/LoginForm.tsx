@@ -19,22 +19,18 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: '/meetAika'
-      });
-
-      // Note: We won't reach this code because of redirect: true
-      // This is just for TypeScript to be happy
-      return;
-
-      // Track successful login
+      // Track successful login before redirect
       analytics.trackEvent({
         category: 'authentication',
         action: Events.LOGIN_SUCCESS,
         label: email
+      });
+
+      await signIn('credentials', {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: '/meetAika'
       });
     } catch (error) {
       console.error('Login error:', error);
