@@ -1,54 +1,40 @@
 # Changelog
 
-## [0.2.0] - 2025-02-23
-### Added
-- Microsoft Clarity integration for enhanced analytics
-  - User behavior tracking
-  - Event tracking
-  - Session upgrades
-  - Custom tags
-- Cookie consent management
-- Favicon support
-  - Multiple resolutions (16x16, 32x32)
-  - Apple touch icon (180x180)
-  - Web manifest for PWA support
-
-### Fixed
-- Navigation visibility in layout component
-- Analytics initialization and event tracking
-- Header handling in server components
-
-
-## [2025-02-23]
-### Added
-- Created Learn More page with modern glassmorphic design
-  - Hero section with clear value proposition and CTA buttons
-  - "Why Invest in Aiko?" section highlighting key investment points
-  - "How Aiko Works" section explaining the technology
-  - Downloadable resources section with pitch deck and whitepaper
-  - FAQ accordion section for investor questions
-- New components:
-  - `ResourceCard` for downloadable documents
-  - `FaqAccordion` with smooth animations
-- Added `openInNewTab` prop to `GradientButton` component
-- Created `/public/investor-resources` directory for investor documents
-
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
+## [0.1.0] - 2025-02-24
 ### Added
-- Added react-icons package for improved icon support
-- Added 'use client' directive to client components
+- Next.js 14 app router implementation
+- Authentication system using NextAuth.js
+  - Environment-based user management
+  - Session handling and middleware protection
+  - Login form with error handling
+- Analytics integration
+  - Event tracking for authentication
+  - User behavior monitoring
+- Core pages and components
+  - Login page with form validation
+  - Meet Aika page for AI interaction
+  - Learn page with investor resources
+  - Protected routes and middleware
+- API Routes
+  - Authentication endpoints
+  - Chat interface
+  - Investment notification system
 
-### Fixed
-- Fixed navigation bar logo path to use correct SVG file
-- Removed duplicate header from chat interface
-- Fixed dependency conflicts with legacy peer deps
+### Known Issues
+- User authentication requires proper environment variable setup
+- Login credentials need to be properly configured in AUTH_USERS
+- Some TypeScript and ESLint warnings present
+
+### Technical Debt
+- Improve error handling in authentication system
+- Add proper TypeScript types for NextAuth session
+- Implement proper test coverage
+- Add proper documentation for environment variables
 
 ### Added
 - Enhanced login experience:
