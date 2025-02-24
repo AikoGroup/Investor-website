@@ -18,32 +18,27 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (!result?.ok) {
-        setError('Invalid email or password');
-        analytics.trackEvent({
-          category: 'authentication',
-          action: Events.LOGIN_FAILURE,
-          label: email
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Track successful login
+      // Track login attempt
       analytics.trackEvent({
         category: 'authentication',
         action: Events.LOGIN_SUCCESS,
         label: email
       });
 
-      // Manually redirect after successful login
-      window.location.href = '/meetAika';
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: '/meetAika'
+      });
+
+      if (!result?.ok) {
+        setError('Invalid email or password');
+        setIsLoading(false);
+        return;
+      }
+
+      // NextAuth will handle the redirect
     } catch (error) {
       console.error('Login error:', error);
       setError('Failed to sign in');
