@@ -19,7 +19,8 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
+      // Using any here since the next-auth types are not properly exposed
+      const result: any = await signIn('credentials', {
         email,
         password,
         redirect: false,
