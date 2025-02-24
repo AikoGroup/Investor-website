@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { SignInResponse } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import analytics, { Events } from '@/lib/analytics';
 
@@ -20,6 +21,7 @@ export default function LoginForm() {
 
     try {
       const result = await signIn('credentials', {
+        // @ts-expect-error - next-auth types are not up to date
         email,
         password,
         redirect: false,
