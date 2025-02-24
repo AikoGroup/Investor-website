@@ -231,7 +231,7 @@ export default function ChatInterface() {
                 placeholder="Send a message..."
                 className="
                   flex-1 px-2.5 py-2 sm:p-2.5 md:p-3
-                  text-sm sm:text-base
+                  text-base
                   rounded-l-lg sm:rounded-l-xl
                   bg-white/80 backdrop-blur-sm
                   text-blue-900 placeholder-blue-400
