@@ -19,36 +19,24 @@ export default function LoginForm() {
     setError('');
 
     try {
-      // Using any here since the next-auth types are not properly exposed
-      const result: any = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: '/meetAika'
-      });
-
-      if (!result?.ok) {
-        setError('Email or password is incorrect');
-        setIsLoading(false);
-        return;
-      }
-
-      // Track successful login
+      // Track login attempt
       analytics.trackEvent({
         category: 'authentication',
         action: Events.LOGIN_SUCCESS,
         label: email
       });
 
-      // Redirect after tracking
-      if (result.url) {
-        router.push(result.url);
-      } else {
-        router.push('/meetAika');
-      }
+      await signIn('credentials', {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: '/meetAika'
+      });
+
+      // The signIn function will handle the redirect
     } catch (error) {
       console.error('Login error:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError('Failed to sign in');
       setIsLoading(false);
     }
   };
