@@ -68,6 +68,9 @@ node scripts/test-webhook.js
 # Then run the test script
 ```
 
+test@aiko.insure
+Test123!@#
+
 The webhook test script sends a simulated user profile to the n8n workflow endpoint, allowing you to test:
 - User onboarding flow
 - Preference processing
