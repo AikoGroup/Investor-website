@@ -73,11 +73,9 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.firstName || user.email.split('@')[0]
-          }
+          // Return all user data except password
+          const { password, ...userData } = user;
+          return userData;
         } catch (error) {
           console.error('Auth error:', error)
           return null
@@ -101,17 +99,28 @@ export const authOptions: NextAuthOptions = {
     }
   },
   callbacks: {
+    async jwt({ token, user }) {
+      // Pass user data to the token on sign in
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (session.user) {
-        // Extend the user type to include id
-        const user = session.user as {
-          name?: string | null;
-          email?: string | null;
-          image?: string | null;
-          id?: string;
+      if (token.user) {
+        // Pass all user data from token to session
+        session.user = token.user as typeof session.user & {
+          id: string;
+          firstName?: string;
+          lastName?: string;
+          company?: string;
+          role?: string;
+          industry?: string;
+          companySize?: string;
+          department?: string;
+          location?: string;
+          timezone?: string;
         };
-        user.id = token.sub || user.email || '';
-        session.user = user;
       }
       return session;
     }

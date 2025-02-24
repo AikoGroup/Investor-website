@@ -8,6 +8,9 @@ export function middleware(request: NextRequest) {
 
   // Check if the request is for the meetAika page
   if (request.nextUrl.pathname === '/meetAika') {
+    // Log session data for debugging
+    console.log('Session cookies:', request.cookies.toString());
+    console.log('Headers:', Object.fromEntries(request.headers.entries()));
     // Check both standard and secure session tokens
     const token = request.cookies.get('next-auth.session-token') || 
                  request.cookies.get('__Secure-next-auth.session-token');
