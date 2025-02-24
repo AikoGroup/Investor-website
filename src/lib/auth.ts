@@ -86,31 +86,27 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials: { email: string; password: string } | undefined) {
+      async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
             return null
           }
 
           const users = getUsers();
-          console.error('Auth attempt for email:', credentials.email);
           const storedUser = users.find(u => u.email === credentials.email)
           
           if (!storedUser) {
-            console.error('User not found:', credentials.email);
             return null
           }
 
           // Compare password with bcrypt
           const isValidPassword = await bcrypt.compare(credentials.password, storedUser.password)
           if (!isValidPassword) {
-            console.error('Invalid password for user:', credentials.email);
             return null
           }
 
-          console.error('Successful login for:', credentials.email);
           // Return all user data except password
-          const { password: _password, ...userData } = storedUser;
+          const { password: _password, ...userData } = storedUser; // eslint-disable-line @typescript-eslint/no-unused-vars
           return userData;
         } catch (error) {
           console.error('Auth error:', error)
@@ -123,15 +119,28 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user }) {
+      // Pass user data to the token on sign in
       if (user) {
         token.user = user;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }) {
       if (token.user) {
+        // Pass all user data from token to session
         session.user = {
           ...session.user,
           ...token.user,
