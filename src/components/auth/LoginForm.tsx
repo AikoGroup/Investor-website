@@ -22,15 +22,13 @@ export default function LoginForm() {
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        redirect: true,
         callbackUrl: '/meetAika'
       });
 
-      if (!result?.ok) {
-        setError('Email or password is incorrect');
-        setIsLoading(false);
-        return;
-      }
+      // Note: We won't reach this code because of redirect: true
+      // This is just for TypeScript to be happy
+      return;
 
       // Track successful login
       analytics.trackEvent({
@@ -38,13 +36,6 @@ export default function LoginForm() {
         action: Events.LOGIN_SUCCESS,
         label: email
       });
-
-      // Navigate to meetAika using the router
-      if (result.url) {
-        router.push(result.url);
-      } else {
-        router.push('/meetAika');
-      }
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
