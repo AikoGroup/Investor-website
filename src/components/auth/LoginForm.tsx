@@ -25,14 +25,20 @@ export default function LoginForm() {
         label: email
       });
 
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
         redirect: true,
         callbackUrl: '/meetAika'
       });
 
-      // The signIn function will handle the redirect
+      if (!result?.ok) {
+        setError('Invalid email or password');
+        setIsLoading(false);
+        return;
+      }
+
+      // NextAuth will handle the redirect
     } catch (error) {
       console.error('Login error:', error);
       setError('Failed to sign in');

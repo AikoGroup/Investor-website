@@ -8,7 +8,9 @@ export function middleware(request: NextRequest) {
 
   // Check if the request is for the meetAika page
   if (request.nextUrl.pathname === '/meetAika') {
-    const token = request.cookies.get('next-auth.session-token');
+    // Check both standard and secure session tokens
+    const token = request.cookies.get('next-auth.session-token') || 
+                 request.cookies.get('__Secure-next-auth.session-token');
     if (!token) {
       // Redirect to login if no session token found
       return NextResponse.redirect(new URL('/login', request.url));
