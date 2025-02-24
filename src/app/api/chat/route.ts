@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
+export const maxDuration = 60; // Set maximum duration to 60 seconds (Vercel Hobby limit)
+
 export async function POST(request: NextRequest) {
   try {
     const { input, history, context, sessionId, user } = await request.json();
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     // Create an AbortController to handle timeouts
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 300000); // 5 minute timeout (leaving 1 minute buffer for Lambda)
+    const timeout = setTimeout(() => controller.abort(), 58000); // 58 second timeout (2s buffer before Vercel limit)
 
     let response;
     try {
