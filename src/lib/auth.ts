@@ -1,5 +1,4 @@
-import { NextAuthOptions, Session, User } from "next-auth"
-import { JWT } from "next-auth/jwt"
+import { NextAuthOptions, User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcryptjs'
 
@@ -98,7 +97,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Return all user data except password
-          const { password, ...userData } = storedUser;
+          const { password: _password, ...userData } = storedUser; // eslint-disable-line @typescript-eslint/no-unused-vars
           return userData;
         } catch (error) {
           console.error('Auth error:', error)
