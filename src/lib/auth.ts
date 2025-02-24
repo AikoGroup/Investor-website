@@ -42,32 +42,23 @@ interface StoredUser {
 
 // Get users from environment variables
 const getUsers = (): StoredUser[] => {
-  console.error('=== AUTH DEBUG START ===');
   const usersJson = process.env.AUTH_USERS;
-  console.error('AUTH_USERS env var exists:', !!usersJson);
-  console.error('AUTH_USERS env var type:', typeof usersJson);
-  console.error('AUTH_USERS length:', usersJson?.length);
+  console.log('Auth users from env:', usersJson); // Debug log
   
   if (!usersJson) {
     console.error('No users found in environment variables');
-    console.error('=== AUTH DEBUG END ===');
     return [];
   }
-
   try {
     // Clean the JSON string - remove any whitespace at start/end
     const cleanJson = usersJson.trim();
-    console.error('AUTH_USERS after trim length:', cleanJson.length);
+    console.log('Cleaned JSON:', cleanJson); // Debug log
     
     const users = JSON.parse(cleanJson);
-    console.error('Successfully parsed users array. Count:', users.length);
-    console.error('Available emails:', users.map(u => u.email).join(', '));
-    console.error('=== AUTH DEBUG END ===');
+    console.log('Parsed users:', users); // Debug log
     return users;
   } catch (error) {
-    console.error('Failed to parse users from environment variables');
-    console.error('Parse error:', error);
-    console.error('=== AUTH DEBUG END ===');
+    console.error('Failed to parse users from environment variables:', error);
     return [];
   }
 }
