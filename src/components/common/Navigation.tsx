@@ -48,32 +48,37 @@ const Navigation = () => {
       ">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
-              <Image
-                src="/images/aiko_logo_white.svg"
-                alt="Aiko Logo"
-                width={120}
-                height={40}
-                priority
-                className="h-8 w-auto"
-              />
-            </Link>
+            <div className="flex items-center">
+              {/* Logo */}
+              <Link href="/" className="flex-shrink-0">
+                <Image
+                  src="/images/aiko_logo_white.svg"
+                  alt="Aiko Logo"
+                  width={120}
+                  height={40}
+                  priority
+                  className="h-8 w-auto"
+                />
+              </Link>
 
-            {/* Desktop Navigation */}
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-4 ml-8">
+                <NavLink href="/meetAika">
+                  Chat with Aika
+                </NavLink>
+                <NavLink href="/learn">
+                  Learn More
+                </NavLink>
+              </div>
+            </div>
+
+            {/* Desktop Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <NavLink href="/meetAika">
-                Chat with Aika
-              </NavLink>
-              <NavLink href="/learn">
-                Learn More
-              </NavLink>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsInvestModalOpen(true)}
                 className="
-                  ml-4
                   px-6 py-2
                   bg-gradient-to-r from-yellow-400 to-yellow-500
                   hover:from-yellow-500 hover:to-yellow-600
@@ -92,7 +97,6 @@ const Navigation = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => signOut({ callbackUrl: '/login' })}
                 className="
-                  ml-4
                   px-4 py-2
                   bg-transparent
                   hover:bg-white/10
@@ -110,6 +114,7 @@ const Navigation = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-md text-white hover:bg-white/10"
+              aria-label="Toggle menu"
             >
               <svg
                 className="h-6 w-6"
@@ -137,20 +142,23 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu */}
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="md:hidden py-4 space-y-2"
-            >
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: isMobileMenuOpen ? 'auto' : 0,
+              opacity: isMobileMenuOpen ? 1 : 0
+            }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden overflow-hidden"
+          >
+            <div className="py-4 space-y-3">
               <NavLink href="/meetAika" onClick={() => setIsMobileMenuOpen(false)}>
                 Chat with Aika
               </NavLink>
               <NavLink href="/learn" onClick={() => setIsMobileMenuOpen(false)}>
                 Learn More
               </NavLink>
-              <div className="pt-2 space-y-2">
+              <div className="pt-3 space-y-3">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
@@ -159,14 +167,13 @@ const Navigation = () => {
                   }}
                   className="
                     w-full
-                    px-6 py-2
+                    px-4 py-2
                     bg-gradient-to-r from-yellow-400 to-yellow-500
                     hover:from-yellow-500 hover:to-yellow-600
                     rounded-full
                     text-gray-900
                     font-medium
                     shadow-lg
-                    hover:shadow-xl
                     transition-all duration-300
                   "
                 >
@@ -189,8 +196,8 @@ const Navigation = () => {
                   Logout
                 </motion.button>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
         </div>
       </nav>
       <InvestModal isOpen={isInvestModalOpen} setIsOpen={setIsInvestModalOpen} />

@@ -165,9 +165,9 @@ export default function ChatInterface() {
     <div className="flex flex-col h-screen pt-16">
 
       {/* Chat Container */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 w-full max-w-3xl mx-auto">
+      <div className="flex-1 flex flex-col items-center justify-center px-2 sm:px-4 w-full max-w-lg sm:max-w-xl md:max-w-2xl mx-auto">
         {/* Avatar */}
-        <div className="relative w-20 h-20 md:w-24 md:h-24 mb-6 md:mb-8">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mb-4 sm:mb-6 md:mb-8">
           {/* Glow ring - only shows when loading */}
           <div className={`absolute -inset-2 rounded-full ${isLoading ? 'animate-glow-spin bg-white/20' : ''}`} />
           {/* Avatar container */}
@@ -184,10 +184,10 @@ export default function ChatInterface() {
         </div>
 
         {/* Chat Box */}
-        <div className="w-full bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 shadow-lg border border-white/20">
+        <div className="w-full bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border border-white/20">
           <div 
             ref={chatContainerRef} 
-            className="h-[350px] md:h-[400px] overflow-y-auto space-y-4 mb-4 pr-2 md:pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+            className="h-[60vh] sm:h-[350px] md:h-[400px] overflow-y-auto space-y-3 sm:space-y-4 mb-3 sm:mb-4 pr-2 md:pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
           >
             {messages.map((message) => (
               <div
@@ -195,7 +195,7 @@ export default function ChatInterface() {
                 className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[85%] md:max-w-[70%] rounded-lg p-2 md:p-3 text-sm md:text-base ${
+                  className={`max-w-[88%] sm:max-w-[85%] md:max-w-[75%] rounded-lg sm:rounded-xl p-2.5 sm:p-3 text-sm sm:text-base ${
                     message.role === 'user'
                       ? 'bg-white/90 backdrop-blur-sm text-blue-900 shadow-md'
                       : 'bg-blue-100/90 backdrop-blur-sm text-blue-900 shadow-md'
@@ -222,17 +222,17 @@ export default function ChatInterface() {
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit} className="mt-4">
-            <div className="flex space-x-2">
+          <form onSubmit={handleSubmit} className="mt-3 sm:mt-4">
+            <div className="flex space-x-1.5 sm:space-x-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Send a message..."
                 className="
-                  flex-1 p-2 md:p-3
-                  text-sm md:text-base
-                  rounded-l-lg
+                  flex-1 px-2.5 py-2 sm:p-2.5 md:p-3
+                  text-sm sm:text-base
+                  rounded-l-lg sm:rounded-l-xl
                   bg-white/80 backdrop-blur-sm
                   text-blue-900 placeholder-blue-400
                   focus:outline-none focus:bg-white/90
@@ -244,9 +244,9 @@ export default function ChatInterface() {
                 type="submit"
                 disabled={isLoading}
                 className="
-                  p-2 md:p-3
+                  px-2.5 py-2 sm:p-2.5 md:p-3
                   bg-white/80 backdrop-blur-sm
-                  rounded-r-lg
+                  rounded-r-lg sm:rounded-r-xl
                   hover:bg-white/90
                   focus:outline-none
                   disabled:opacity-50
@@ -254,7 +254,7 @@ export default function ChatInterface() {
                 "
               >
                 <svg
-                  className="w-5 h-5 md:w-6 md:h-6 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
