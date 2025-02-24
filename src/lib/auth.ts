@@ -59,9 +59,9 @@ const getUsers = (): StoredUser[] => {
     const cleanJson = usersJson.trim();
     console.error('AUTH_USERS after trim length:', cleanJson.length);
     
-    const users = JSON.parse(cleanJson);
+    const users = JSON.parse(cleanJson) as StoredUser[];
     console.error('Successfully parsed users array. Count:', users.length);
-    console.error('Available emails:', users.map(u => u.email).join(', '));
+    console.error('Available emails:', users.map((u: StoredUser) => u.email).join(', '));
     console.error('=== AUTH DEBUG END ===');
     return users;
   } catch (error) {
@@ -71,6 +71,9 @@ const getUsers = (): StoredUser[] => {
     return [];
   }
 }
+
+import { JWT } from 'next-auth/jwt';
+import { Session } from 'next-auth';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -110,7 +113,8 @@ export const authOptions: NextAuthOptions = {
 
           console.error('Successful login for:', credentials.email);
           // Return all user data except password
-          const { password: _password, ...userData } = storedUser;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { password, ...userData } = storedUser;
           return userData;
         } catch (error) {
           console.error('Auth error:', error)
@@ -124,13 +128,13 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user }: { token: JWT; user: User | undefined }) {
       if (user) {
         token.user = user;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token.user) {
         session.user = {
           ...session.user,
