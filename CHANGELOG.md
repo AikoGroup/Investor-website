@@ -51,6 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prominent Invest Now CTA button
 
 ### Added
+- Enhanced mobile responsiveness:
+  - Fixed auto-zoom issues on mobile input fields
+  - Optimized chat interface for mobile devices
+  - Improved message bubble sizing and spacing
+  - Added proper viewport meta settings
+  - Adjusted font sizes for better mobile readability
+
+### Added
 - Created comprehensive Learn More page with interactive elements:
   - Glassmorphic design with gradient backgrounds
   - Interactive FAQ accordion with animations
