@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { requireSession, extractUserInfo } from '@/lib/session';
 
 export const maxDuration = 60; // Set maximum duration to 60 seconds (Vercel Hobby limit)
 
 export async function POST(request: NextRequest) {
   try {
-    const { input, history, context, sessionId, user } = await request.json();
+    // Verify user session and get user info
+    const session = await requireSession();
+    const userInfo = extractUserInfo(session);
+    const { input, history, context, sessionId } = await request.json();
     console.log('Received payload:', { input, history, context, sessionId });
 
     const payload = {
@@ -14,7 +18,7 @@ export async function POST(request: NextRequest) {
       history,
       context,
       sessionId,
-      user
+      user: userInfo
     };
 
     const startTime = Date.now();

@@ -1,17 +1,15 @@
 # Aiko Investor Hub
 
-A modern, AI-driven investor relations platform built with Next.js, featuring:
+A modern, AI-driven investor relations platform built with Next.js 14, featuring:
 - AI-powered chat interface with Aika
 - Investor resources and documentation
-- User authentication and management
-- Real-time updates and notifications
-
+- Secure user authentication
+- Analytics tracking
 
 ## Prerequisites
 
 - Node.js 18.x or later
 - npm or yarn package manager
-- MongoDB (for user management)
 
 ## Installation
 
@@ -24,41 +22,41 @@ cd website
 2. Install dependencies:
 ```bash
 npm install
-# or
-yarn install
 ```
 
 3. Set up environment variables:
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your configuration
 ```
 
-## Development Commands
+Required environment variables:
+```env
+NEXTAUTH_URL=https://investors.aiko.insure
+NEXTAUTH_SECRET=your-secret-key
+AUTH_USERS=[{"id":"1","email":"user@example.com","password":"hashed-password"}]
+NEXT_PUBLIC_N8N_WEBHOOK_URL=your-webhook-url
+ANTHROPIC_API_KEY=your-api-key
+DISCORD_WEBHOOK_URL=your-webhook-url
+```
 
-### Start Development Server
+## Development
+
 ```bash
 npm run dev
-# or
-yarn dev
-```
-Open [http://localhost:3000](http://localhost:3000) to view the app.
-
-### Run Tests
-```bash
-# Run all tests
-npm run test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run workflow tests
-npm run test:workflow
 ```
 
-### Test n8n Webhooks
-```bash
-# Test with default user profile
+Open [http://localhost:3000](http://localhost:3000)
+
+## Known Issues
+
+1. Authentication System:
+   - AUTH_USERS environment variable must be properly configured
+   - Password must be bcrypt hashed
+   - Contact admin for valid credentials
+
+2. Development Setup:
+   - All environment variables must be set
+   - Some TypeScript/ESLint warnings may appear during build
 node scripts/test-webhook.js
 
 # Test with custom profile (edit userProfile in test-webhook.js)

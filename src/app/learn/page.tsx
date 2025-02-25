@@ -54,6 +54,7 @@ const LearnPage = () => {
                 <GradientButton
                   href="/schedule"
                   icon={<FaCalendar />}
+                  className="hidden"
                 >
                   Schedule a Meeting
                 </GradientButton>

@@ -22,7 +22,18 @@ export const SuggestionButtons: React.FC<SuggestionButtonsProps> = ({
         <button
           key={index}
           onClick={() => onSuggestionClick(suggestion.value)}
-          className="px-4 py-2 text-sm text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-colors text-left break-words rounded-full max-w-[300px] shadow-sm"
+          className="
+            px-3 py-1.5 md:px-4 md:py-2
+            text-xs md:text-sm
+            text-white
+            bg-white/20 hover:bg-white/30
+            backdrop-blur-sm
+            transition-colors
+            text-left break-words
+            rounded-full
+            max-w-[250px] md:max-w-[300px]
+            shadow-sm
+          "
         >
           {suggestion.label}
         </button>

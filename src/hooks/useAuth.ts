@@ -1,34 +1,13 @@
-import { useState, useEffect } from 'react';
-
-interface AuthUser {
-  id: string;
-  email: string;
-  firstName: string;
-}
+import { useSession } from 'next-auth/react';
+import type { UserSession } from '@/lib/session';
 
 export function useAuth() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const loading = status === 'loading';
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/session');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.user) {
-            setUser(data.user);
-          }
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  return { user, loading };
+  return { 
+    user: (session?.user || null) as UserSession['user'] | null,
+    loading,
+    session: session as UserSession | null
+  };
 }

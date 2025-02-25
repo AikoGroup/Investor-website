@@ -1,12 +1,74 @@
-import { NextAuthOptions } from "next-auth"
+import { NextAuthOptions, User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import fs from 'fs'
-import path from 'path'
 import bcrypt from 'bcryptjs'
 
-const AUTH_FILE_PATH = path.join(process.cwd(), 'src/config/auth.json')
+// Extend the built-in types
+declare module 'next-auth' {
+  interface User {
+    id: string
+    email: string
+    firstName?: string
+    lastName?: string
+    company?: string
+    role?: string
+    industry?: string
+    companySize?: string
+    department?: string
+    location?: string
+    timezone?: string
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    user?: User
+  }
+}
+
+interface StoredUser {
+  id: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  role?: string;
+  industry?: string;
+  companySize?: string;
+  department?: string;
+  location?: string;
+  timezone?: string;
+}
+
+// Get users from environment variables
+const getUsers = (): StoredUser[] => {
+  const usersJson = process.env.AUTH_USERS;
+  console.log('Auth users from env:', usersJson); // Debug log
+  
+  if (!usersJson) {
+    console.error('No users found in environment variables');
+    return [];
+  }
+  try {
+    // Clean the JSON string - remove any whitespace at start/end
+    const cleanJson = usersJson.trim();
+    console.log('Cleaned JSON:', cleanJson); // Debug log
+    
+    const users = JSON.parse(cleanJson);
+    console.log('Parsed users:', users); // Debug log
+    return users;
+  } catch (error) {
+    console.error('Failed to parse users from environment variables:', error);
+    return [];
+  }
+}
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/login',
+    signOut: '/login',
+  },
   debug: process.env.NODE_ENV === 'development',
   providers: [
     CredentialsProvider({
@@ -21,31 +83,22 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Read users from JSON file
-          const authData = JSON.parse(fs.readFileSync(AUTH_FILE_PATH, 'utf-8'))
-          interface User {
-            email: string;
-            password: string;
-            name?: string;
-            role?: string;
-          }
-          const user = authData.users.find((u: User) => u.email === credentials.email)
-
-          if (!user) {
+          const users = getUsers();
+          const storedUser = users.find(u => u.email === credentials.email)
+          
+          if (!storedUser) {
             return null
           }
 
           // Compare password with bcrypt
-          const isValidPassword = await bcrypt.compare(credentials.password, user.password)
+          const isValidPassword = await bcrypt.compare(credentials.password, storedUser.password)
           if (!isValidPassword) {
             return null
           }
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.firstName || user.email.split('@')[0]
-          }
+          // Return all user data except password
+          const { password: _password, ...userData } = storedUser; // eslint-disable-line @typescript-eslint/no-unused-vars
+          return userData;
         } catch (error) {
           console.error('Auth error:', error)
           return null
@@ -53,24 +106,36 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  pages: {
-    signIn: '/login',
-  },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
   },
   callbacks: {
+    async jwt({ token, user }) {
+      // Pass user data to the token on sign in
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (session.user) {
-        // Extend the user type to include id
-        const user = session.user as {
-          name?: string | null;
-          email?: string | null;
-          image?: string | null;
-          id?: string;
+      if (token.user) {
+        // Pass all user data from token to session
+        session.user = {
+          ...session.user,
+          ...token.user,
         };
-        user.id = token.sub || user.email || '';
-        session.user = user;
       }
       return session;
     }

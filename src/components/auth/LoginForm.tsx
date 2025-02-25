@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+
 import { signIn } from 'next-auth/react';
 import analytics, { Events } from '@/lib/analytics';
 
@@ -11,7 +11,6 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,35 +18,30 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: '/meetAika'
-      });
-
-      if (!result?.ok) {
-        setError('Email or password is incorrect');
-        setIsLoading(false);
-        return;
-      }
-
-      // Track successful login
+      // Track login attempt
       analytics.trackEvent({
         category: 'authentication',
         action: Events.LOGIN_SUCCESS,
         label: email
       });
 
-      // Navigate to meetAika using the router
-      if (result.url) {
-        router.push(result.url);
-      } else {
-        router.push('/meetAika');
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: '/meetAika'
+      });
+
+      if (!result?.ok) {
+        setError('Invalid email or password');
+        setIsLoading(false);
+        return;
       }
+
+      // NextAuth will handle the redirect
     } catch (error) {
       console.error('Login error:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError('Failed to sign in');
       setIsLoading(false);
     }
   };
